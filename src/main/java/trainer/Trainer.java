@@ -1,0 +1,120 @@
+package trainer;
+
+import exceptions.TeamFullException;
+import pokemon.Pokemon;
+
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class Trainer {
+
+    private final String name;
+    private final ArrayList<Pokemon> team = new ArrayList<>();
+
+    public Trainer(String name) {
+        this.name = name;
+    }
+
+    public void addPokemon(Pokemon pokemon) throws TeamFullException {
+
+        if (team.size() >= 6) {
+
+            throw new TeamFullException(
+                    "Your team already has 6 Pokemons!"
+            );
+        }
+
+        if (team.contains(pokemon)) {
+            System.out.println("Pokemon already in team!");
+            return;
+        }
+
+        team.add(pokemon);
+        System.out.println(pokemon.getName() + " added to team!");
+        System.out.println("Current team size: " + team.size());
+    }
+
+    public void removePokemon(int index) {
+
+        if (index < 0 || index >= team.size()) {
+            System.out.println("Invalid index.");
+            return;
+        }
+
+        Pokemon removed = team.remove(index);
+        System.out.println(removed.getName() + " removed from team!");
+    }
+
+    public void showTeam() {
+
+        System.out.println("\n===== " + name + " TEAM =====");
+
+        if (team.isEmpty()) {
+            System.out.println("Empty team");
+            return;
+        }
+
+        for (int i = 0; i < team.size(); i++) {
+
+            Pokemon p = team.get(i);
+
+            System.out.println(i + " - " + p.getName() + (p.isFainted() ? " (FAINTED)" : ""));
+        }
+    }
+
+    public Pokemon getFirstAlivePokemon() {
+
+        for (Pokemon p : team) {
+            if (!p.isFainted()) {
+                return p;
+            }
+        }
+
+        return null;
+    }
+
+    public Pokemon choosePokemon(Scanner scanner) {
+
+        showTeam();
+
+        System.out.println("\nChoose a pokemon:");
+
+        while (true) {
+
+            System.out.print("> ");
+
+            if (scanner.hasNextInt()) {
+
+                int index = scanner.nextInt();
+
+                if (index >= 0 && index < team.size()) {
+
+                    Pokemon chosen = team.get(index);
+
+                    if (chosen.isFainted()) {
+                        System.out.println("This pokemon has fainted!");
+                        continue;
+                    }
+
+                    return chosen;
+                }
+            } else {
+                scanner.next();
+            }
+
+            System.out.println("Invalid option.");
+        }
+    }
+
+    public ArrayList<Pokemon> getTeam() {
+        return team;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public boolean hasAlivePokemons() {
+        return getFirstAlivePokemon() != null;
+    }
+}
